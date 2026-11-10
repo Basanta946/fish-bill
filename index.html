@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0d9488">
+<link rel="manifest" href="./manifest.json">
 <title>Fish Bill</title>
 <style>
 *{box-sizing:border-box}
@@ -231,6 +233,11 @@ async function shareBill(){
  if(navigator.share){try{await navigator.share({title:'Fish Bill - '+customer,text})}catch(e){}}
  else if(navigator.clipboard){await navigator.clipboard.writeText(text);alert('Bill copied. You can paste it in WhatsApp.')}
  else alert(text);
+}
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => { navigator.serviceWorker.register("./sw.js").catch(err => console.error("Offline setup failed", err)); });
 }
 </script>
 </body>
