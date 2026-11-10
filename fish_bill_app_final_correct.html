@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fish Bill</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f4f6;font-family:Arial,sans-serif;padding:14px;color:#111}
+.card{max-width:600px;margin:auto;background:#fff;border-radius:20px;padding:20px;box-shadow:0 8px 25px rgba(0,0,0,.1)}
+h1{text-align:center;margin:0 0 4px;font-size:28px}.sub{text-align:center;color:#666;margin:0 0 20px}
+label{display:block;font-weight:700;margin:0 0 7px}
+input{width:100%;padding:12px;border:1px solid #ccc;border-radius:10px;font-size:17px}
+.top{display:grid;grid-template-columns:1fr 150px;gap:10px;margin-bottom:18px}
+.item{border:1px solid #ddd;border-radius:14px;padding:13px;margin-bottom:11px}
+.itemhead{font-weight:700;margin-bottom:9px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px}
+.amount{text-align:right;margin-top:9px;font-weight:700}
+.total{background:#f0fdf4;border-radius:14px;padding:17px;text-align:center;margin-top:16px}
+.total small{color:#555}.grand{font-size:36px;font-weight:800;margin-top:4px}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+button{padding:13px;border:0;border-radius:11px;font-size:16px;font-weight:700}
+.primary{background:#111;color:white}.secondary{background:#e5e7eb;color:#111}
+.note{text-align:center;color:#777;font-size:12px;margin-top:14px}
+#printHeader{display:none}
+@media(max-width:430px){.top{grid-template-columns:1fr}.row{grid-template-columns:1fr 1fr}}
+@media print{
+#printHeader{display:grid;grid-template-columns:25% 25% 25% 25%;font-weight:700;border:1.5px solid #111;border-bottom:0;margin-top:8px}
+#printHeader span{text-align:center;padding:10px 8px;border-right:1.5px solid #111}
+#printHeader span:last-child{border-right:0}
+
+body{background:white;padding:0;color:#111}
+.card{box-shadow:none;max-width:760px;border-radius:0;padding:18px 28px;margin:auto}
+h1{text-align:center;font-size:24px;margin:0 0 2px}
+.sub{text-align:center;font-size:13px;margin:0 0 16px}
+
+.top{display:grid;grid-template-columns:1fr 180px;gap:20px;margin-bottom:14px}
+.top label{display:inline;font-weight:700;margin-right:6px}
+.top input{border:0;padding:0;font-size:15px;width:auto;font-weight:600}
+
+#items{margin-top:0}
+#items:before{display:none}
+
+.item{
+display:grid;
+grid-template-columns:25% 25% 25% 25%;
+align-items:center;
+border:1.5px solid #111;
+border-top:0;
+border-radius:0;
+padding:0;
+margin:0;
+}
+.itemhead{display:none}
+
+.item .fish{
+grid-column:1;grid-row:1;
+border:0;border-right:1.5px solid #111;
+padding:10px 12px;
+font-size:15px;font-weight:600;
+}
+.item .row{display:contents}
+
+.item .weight{
+grid-column:2;grid-row:1;
+border:0;border-right:1.5px solid #111;
+padding:10px 12px;
+text-align:center;font-size:15px;
+}
+.item .rate{
+grid-column:3;grid-row:1;
+border:0;border-right:1.5px solid #111;
+padding:10px 12px;
+text-align:center;font-size:15px;
+}
+.item .amount{
+grid-column:4;grid-row:1;
+border:0;
+padding:10px 12px;
+margin:0;
+text-align:center;
+font-size:0;
+font-weight:600;
+}
+.item .amount span{font-size:15px}
+.item.print-hide{display:none}
+
+.buttons,.note,button{display:none}
+
+.total{
+background:none;border-top:2px solid #111;border-radius:0;
+padding:12px 4px;margin-top:10px;text-align:right;
+}
+.total small{font-size:15px;font-weight:700;margin-right:18px}
+.grand{display:inline;font-size:22px}
+
+.payment{margin-top:10px;border-top:0;padding-top:0}
+.pay-row{margin:5px 0;font-size:14px}
+.pay-row input{border:0;padding:0;width:120px;text-align:right;font-size:14px;font-weight:600}
+.payment .pay-row strong{min-width:120px;text-align:right}
+}
+.payment{margin-top:12px;border-top:1px solid #ddd;padding-top:10px}
+.pay-row{display:flex;justify-content:flex-end;align-items:center;gap:18px;margin:7px 0;font-size:16px}
+.pay-row strong{min-width:120px;text-align:right}.pay-row input{width:140px;padding:9px}.balance-row{font-weight:700}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>🐟 FISH BILL</h1>
+<p class="sub">10 Item Bill Calculator</p>
+
+<div class="top">
+<div><label>Customer Name</label><input id="customer" type="text" placeholder="e.g. KRISHNA"></div>
+<div><label>Date</label>
+<div style="position:relative">
+<input id="date" type="text" inputmode="numeric" placeholder="DD/MM/YYYY" maxlength="10" readonly onclick="openDatePicker()">
+<input id="datePicker" type="date" style="position:absolute;opacity:0;width:1px;height:1px;pointer-events:none">
+</div>
+</div>
+</div>
+
+<div id="printHeader" aria-hidden="true">
+<span>Fish / Item</span><span>Weight</span><span>Rate/kg</span><span>Amount</span>
+</div>
+<div id="items"></div>
+
+<div class="total">
+<small>GRAND TOTAL</small>
+<div class="grand" id="grand">₹0.00</div>
+</div><div class="payment">
+<div class="pay-row"><span>Grand Total</span><strong id="payTotal">₹0.00</strong></div>
+<div class="pay-row"><span>Paid Amount</span><input id="paidAmount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="₹0.00"></div>
+<div class="pay-row balance-row"><span id="balanceLabel">Remaining</span><strong id="balance">₹0.00</strong></div>
+</div>
+
+<div class="buttons">
+<button class="primary" onclick="preparePrint(); window.print()">🖨️ Print / Save PDF</button>
+<button class="secondary" onclick="shareBill()">📤 Share</button>
+</div>
+<button class="secondary" style="width:100%;margin-top:10px" onclick="clearAll()">Clear Bill</button>
+<p class="note">Weight × Rate/kg = Amount</p>
+</div>
+
+<script>
+const box=document.getElementById('items');
+for(let i=1;i<=10;i++){
+box.insertAdjacentHTML('beforeend',`
+<div class="item">
+<div class="itemhead">Item ${i}</div>
+<input class="fish" type="text" placeholder="Fish name (e.g. Catla)">
+<div class="row">
+<input class="weight" type="number" min="0" step="0.001" inputmode="decimal" placeholder="Weight (kg)">
+<input class="rate" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Rate ₹/kg">
+</div>
+<div class="amount">Amount: ₹<span>0.00</span></div>
+</div>`);
+}
+document.getElementById('date').value=(() => {
+const d=new Date(); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+})();
+document.getElementById('datePicker').value=new Date().toISOString().slice(0,10);
+
+function money(n){return '₹'+n.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function preparePrint(){
+document.querySelectorAll('.item').forEach(item=>{
+const fish=item.querySelector('.fish').value.trim();
+const weight=item.querySelector('.weight').value.trim();
+const rate=item.querySelector('.rate').value.trim();
+item.classList.toggle('print-hide', !(fish || weight || rate));
+});
+}
+window.addEventListener('beforeprint', preparePrint);
+window.addEventListener('afterprint', ()=>{
+document.querySelectorAll('.item').forEach(item=>item.classList.remove('print-hide'));
+});
+function calcPayment(total){
+const paid=parseFloat(document.getElementById('paidAmount').value)||0;
+const balance=total-paid;
+const label=document.getElementById('balanceLabel'),out=document.getElementById('balance');
+if(balance>0){label.textContent='Remaining';out.textContent=money(balance)}
+else if(balance<0){label.textContent='Change / Extra';out.textContent=money(Math.abs(balance))}
+else{label.textContent='Remaining';out.textContent=money(0)}
+document.getElementById('payTotal').textContent=money(total);
+}
+function calc(){
+ let total=0;
+ document.querySelectorAll('.item').forEach(item=>{
+  const w=parseFloat(item.querySelector('.weight').value)||0;
+  const r=parseFloat(item.querySelector('.rate').value)||0;
+  const a=w*r; total+=a;
+  item.querySelector('.amount span').textContent=a.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+ });
+ document.getElementById('grand').textContent=money(total);
+calcPayment(total);
+}
+document.addEventListener('input',calc);
+document.getElementById('paidAmount').addEventListener('input',calc);
+
+function clearAll(){
+ if(!confirm('Clear this bill?')) return;
+ document.getElementById('customer').value='';
+ document.getElementById('date').value=(() => {
+const d=new Date(); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+})();
+document.getElementById('datePicker').value=new Date().toISOString().slice(0,10);
+ document.querySelectorAll('input.fish,input.weight,input.rate').forEach(x=>x.value='');
+document.getElementById('paidAmount').value='';
+ calc();
+}
+
+function openDatePicker(){
+const p=document.getElementById('datePicker');
+if(p.showPicker) p.showPicker(); else p.click();
+}
+document.getElementById('datePicker').addEventListener('change',function(){
+if(!this.value)return;
+const [y,m,d]=this.value.split('-');
+document.getElementById('date').value=d+'/'+m+'/'+y;
+});
+async function shareBill(){
+ const customer=document.getElementById('customer').value.trim()||'Customer';
+ const date=document.getElementById('date').value;
+ let text='FISH BILL\nCustomer: '+customer+'\nDate: '+date+'\n\n';
+ document.querySelectorAll('.item').forEach((item,i)=>{
+  const fish=item.querySelector('.fish').value.trim();
+  const w=parseFloat(item.querySelector('.weight').value)||0;
+  const r=parseFloat(item.querySelector('.rate').value)||0;
+  if(fish||w||r) text+=(i+1)+'. '+(fish||'Item')+' — '+w+' kg × ₹'+r+' = '+money(w*r)+'\n';
+ });
+ text+='\nTOTAL: '+document.getElementById('grand').textContent;
+ if(navigator.share){try{await navigator.share({title:'Fish Bill - '+customer,text})}catch(e){}}
+ else if(navigator.clipboard){await navigator.clipboard.writeText(text);alert('Bill copied. You can paste it in WhatsApp.')}
+ else alert(text);
+}
+</script>
+</body>
+</html>
